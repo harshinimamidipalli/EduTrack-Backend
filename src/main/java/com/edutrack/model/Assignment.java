@@ -1,9 +1,13 @@
 package com.edutrack.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "assignments")
+@Table(name = "assignments")   // uses the table that has image_path & pdf_path
 public class Assignment {
 
     @Id
@@ -14,16 +18,23 @@ public class Assignment {
     private String description;
     private String deadline;
 
+    // New fields for file paths
+    private String imagePath;
+    private String pdfPath;
+
     public Assignment() {
     }
 
-    public Assignment(String title, String description, String deadline) {
+    public Assignment(String title, String description, String deadline, String imagePath, String pdfPath) {
         this.title = title;
         this.description = description;
         this.deadline = deadline;
+        this.imagePath = imagePath;
+        this.pdfPath = pdfPath;
     }
 
     // Getters and setters
+
     public Long getId() {
         return id;
     }
@@ -54,5 +65,21 @@ public class Assignment {
 
     public void setDeadline(String deadline) {
         this.deadline = deadline;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public String getPdfPath() {
+        return pdfPath;
+    }
+
+    public void setPdfPath(String pdfPath) {
+        this.pdfPath = pdfPath;
     }
 }

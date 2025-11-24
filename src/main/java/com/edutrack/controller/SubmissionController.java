@@ -109,25 +109,40 @@ public class SubmissionController {
 
     // ------------------- DOWNLOAD FILE -------------------
     @GetMapping("/files/{fileName}")
-    public org.springframework.http.ResponseEntity<?> getFile(@PathVariable String fileName) {
-        try {
-            File file = new File(UPLOAD_DIR + fileName);
+public org.springframework.http.ResponseEntity<?> getFile(@PathVariable String fileName) {
+    try {
+        File file = new File(UPLOAD_DIR + fileName);
 
-            if (!file.exists()) {
-                return org.springframework.http.ResponseEntity.notFound().build();
-            }
-
-            org.springframework.core.io.Resource resource =
-                    new org.springframework.core.io.FileSystemResource(file);
-
-            return org.springframework.http.ResponseEntity.ok()
-                    .header("Content-Disposition", "attachment; filename=" + file.getName())
-                    .body(resource);
-
-        } catch (Exception e) {
-            return org.springframework.http.ResponseEntity.internalServerError().build();
+        if (!file.exists()) {
+            return org.springframework.http.ResponseEntity.notFound().build();
         }
+
+        String contentType = Files.probeContentType(file.toPath());
+        if (contentType == null) {
+            if (fileName.endsWith(".pdf")) {
+                contentType = "application/pdf";
+            } else if (fileName.matches(".*\\.(png|jpg|jpeg|gif)$")) {
+                contentType = "image/png";
+            } else if (fileName.endsWith(".txt")) {
+                contentType = "text/plain";
+            } else {
+                contentType = "application/octet-stream";
+            }
+        }
+
+        org.springframework.core.io.Resource resource =
+                new org.springframework.core.io.FileSystemResource(file);
+
+        return org.springframework.http.ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.parseMediaType(contentType))
+                .header("Content-Disposition", "inline; filename=" + file.getName())
+                .body(resource);
+
+    } catch (Exception e) {
+        return org.springframework.http.ResponseEntity.internalServerError().build();
     }
+}
+
 
     // ------------------- UPDATE MARKS + FEEDBACK -------------------
     @PutMapping("/{id}")
